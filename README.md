@@ -5,6 +5,9 @@ A lightweight, native macOS wrapper for [Messenger.com](https://www.messenger.co
 ## Features
 
 - **Native Window Experience**: Runs Messenger in its own dedicated window, separate from your browser tabs.
+
+![Messenger App Demo](demo_screenshot.png)
+
 - **Smart Link Handling**:
     - Keeps Messenger navigation internal.
     - Opens external links (YouTube, Google, Facebook, etc.) in your default web browser.
