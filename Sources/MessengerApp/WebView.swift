@@ -60,8 +60,37 @@ struct WebView: NSViewRepresentable {
 }
 
 class RestorableWebView: WKWebView {
+    private var windowObservation: NSKeyValueObservation?
+
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        window?.setFrameAutosaveName("MessengerMainWindow")
+        
+        guard let window = window else { return }
+        
+        // Restore frame from UserDefaults
+        if let savedFrameString = UserDefaults.standard.string(forKey: "ManualWindowFrame") {
+            let savedFrame = NSRectFromString(savedFrameString)
+            if savedFrame != .zero {
+                // Apply asynchronously to allow SwiftUI to finish its initial layout pass
+                DispatchQueue.main.async {
+                    window.setFrame(savedFrame, display: true)
+                }
+            }
+        }
+        
+        // Observe frame changes to save immediately
+        // We use NotificationCenter for window move/resize events
+        NotificationCenter.default.addObserver(self, selector: #selector(windowDidResizeOrMove), name: NSWindow.didResizeNotification, object: window)
+        NotificationCenter.default.addObserver(self, selector: #selector(windowDidResizeOrMove), name: NSWindow.didMoveNotification, object: window)
+    }
+    
+    @objc private func windowDidResizeOrMove() {
+        guard let window = window else { return }
+        let frameString = NSStringFromRect(window.frame)
+        UserDefaults.standard.set(frameString, forKey: "ManualWindowFrame")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
